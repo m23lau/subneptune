@@ -24,9 +24,25 @@
 
 # 3. OPTIONAL
 # Small problem with simulated NIRISS demo data where I get a KeywordError - missing INTSTART and INTEND in header
-# might need to change a few lines (line 103) in Eureka/src/eureka/S1_detector_processing
+# might need to change a few lines (line 103) in Eureka/src/eureka/S1_detector_processing. This isn't an issue with
+# downloaded data sets from the notebook.
 #
 # FROM:       meta.intstart = hdulist[0].header['INTSTART']-1
 #             meta.intend = hdulist[0].header['INTEND']
 # TO:         meta.intstart = hdulist[0].header.get('INTSTART', 1) -  1
 #             meta.intend = hdulist[0].header.get('INTEND', 1) - 1
+
+# -----------------------------------------------------------------------------------------------------------------------
+
+# 4.
+# Likely an issue with something being out of date again, in Eureka/src/eureka/S3_data_reduction, needed to change
+# background.py (line 39) to not include "skip_bg" since S1_detector_processing/s1_meta.py does not give the S1metaclass
+# object an attribute called S1metaclass.skip_bg
+#
+# FROM:    if meta.bg_deg is None or meta.skip_bg:
+# TO:      if meta.bg_deg is None:
+
+# -----------------------------------------------------------------------------------------------------------------------
+# ok i think i'm low key going to give up trying to get eureka to work but i guess i'll at least keep this documentation
+# if i want to do things in the future with it, just not now since i don't think i have enough time to get it running
+# i'll upload this final version

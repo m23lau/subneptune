@@ -3,11 +3,11 @@
 # Stage 4 Documentation: https://eurekadocs.readthedocs.io/en/latest/ecf.html#stage-4
 
 # Number of spectroscopic channels spread evenly over given wavelength range
-nspecchan       2           # Number of spectroscopic channels spread evenly over given wavelength range. Set to None to leave the spectrum unbinned.
+nspecchan       3           # Number of spectroscopic channels spread evenly over given wavelength range. Set to None to leave the spectrum unbinned.
 compute_white   True        # Also compute the white-light lightcurve
 s4_order        None        # For NIRISS, specify spectral order
-wave_min        1.5         # Minimum wavelength. Set to None to use the shortest extracted wavelength from Stage 3.
-wave_max        4.5         # Maximum wavelength. Set to None to use the longest extracted wavelength from Stage 3.
+wave_min        None         # Minimum wavelength. Set to None to use the shortest extracted wavelength from Stage 3.
+wave_max        None         # Maximum wavelength. Set to None to use the longest extracted wavelength from Stage 3.
 wave_input      None        # Full path to a txt file with pre-defined wavelength bins in two columns separated by whitespace.
 allapers        False       # Run S4 on all of the apertures considered in S3? Otherwise will use newest output in the inputdir
 
@@ -50,8 +50,8 @@ hide_plots      True    # If True, plots will automatically be closed rather tha
 verbose         True    # If True, more details will be printed about steps
 
 # Project directory
-topdir          /home/peng/PycharmProjects/S26//DataAnalysis/JWST/MyFirstEureka/
+topdir          /home/peng/PycharmProjects/S26/DataAnalysis/TOI-1130b/
 
 # Directories relative to topdir
-inputdir        Stage3demo    # The folder containing the outputs from Eureka!'s S3 or JWST's S3 pipeline (will be overwritten if calling S3 and S4 sequentially)
-outputdir       Stage4demo
+inputdir        TOI-1130b_S3    # The folder containing the outputs from Eureka!'s S3 or JWST's S3 pipeline (will be overwritten if calling S3 and S4 sequentially)
+outputdir       TOI-1130b_S4

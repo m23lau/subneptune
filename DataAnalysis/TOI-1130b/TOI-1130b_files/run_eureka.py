@@ -11,10 +11,7 @@ import eureka.S4_generate_lightcurves.s4_genLC as s4
 import eureka.S5_lightcurve_fitting.s5_fit as s5
 import eureka.S6_planet_spectra.s6_spectra as s6
 
-# eventlabel = 'imaging_template'
-# eventlabel = 'miri_lrs_template'
-eventlabel = 'wasp39bdemo'
-# eventlabel = 'nircam_wfss_template'
+eventlabel = 'TOI1130b'
 ecf_path = '.'+os.sep
 
 if __name__ == '__main__':
@@ -23,7 +20,7 @@ if __name__ == '__main__':
 
     # meta = s1.rampfitJWST(eventlabel, ecf_path=ecf_path)
 
-    meta = s2.calibrateJWST(eventlabel, ecf_path=ecf_path)
+    # meta = s2.calibrateJWST(eventlabel, ecf_path=ecf_path)
 
     spec, meta = s3.reduce(eventlabel, ecf_path=ecf_path)
 

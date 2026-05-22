@@ -55,8 +55,8 @@ save_fluxdata   False       # Save the much larger FluxData.h5 outputs which can
 verbose         True        # If True, more details will be printed about steps
 
 # Project directory
-topdir          /home/peng/PycharmProjects/S26//DataAnalysis/JWST/MyFirstEureka/
+topdir          /home/peng/PycharmProjects/S26/DataAnalysis/TOI-1130b/
 
 # Directories relative to topdir
-inputdir        Stage2demo      # The folder containing the outputs from Eureka!'s S2 or JWST's S2 pipeline (will be overwritten if calling S2 and S3 sequentially)
-outputdir       Stage3demo
+inputdir        TOI-1130b_S2/S2_2026-05-22_TOI1130b_run2
+outputdir       TOI-1130b_S3
