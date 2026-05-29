@@ -1,4 +1,4 @@
-# I'll document weird changes that I made here that may or may not be visible
+# I've documented weird changes to Eureka! that I made here when I was playing around with it
 # I probably should do this in any file that's not a .py file but too bad
 
 # 1.
