@@ -180,4 +180,4 @@ for wvlngth in bin_slc:
     logev_list.append(results.posteriors['lnZ'])
 
 tspec_vals = np.column_stack([wavelength_list, td_list, tderr_list, logev_list])
-np.savetxt(pn+'_binnedspectrum.txt', tspec_vals, header = 'wavelength, transit depth, transit depth error, log evidence')
+np.savetxt(pn+'_binnedspectrum.txt', tspec_vals, delimiter = ', ', header = 'wavelength, transit depth, transit depth error, log evidence')
