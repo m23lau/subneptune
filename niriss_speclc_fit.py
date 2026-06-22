@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import pickle
 import corner
-import transitspectroscopy as ts
+# import transitspectroscopy as ts
 from tqdm import tqdm
 import csv
 
@@ -18,8 +18,15 @@ with open(path + '_jw03385004001_toi1130_niriss_lcs.pkl', 'rb') as file:
 
 # Define planetary parameters - CHANGE
 per = 4.074554             # Period (Days)
-# t0 = 2460547.1522035785    # Mid-Transit Time (BJD) for Order 1
-t0 = 2460547.1522049229    # for Order 2
+t0 = 2460547.1522035785    # Mid-Transit Time (BJD) for Order 1
+# t0 = 2460547.1522049229    # for Order 2
+
+u1 = -0.2394599063         # Limb-darkening coeffs. for Order 1
+u2 = 1.0756814820 
+
+# u1 = -0.0476971007         # for Order 2
+# u2 = 1.0468093463
+
 a = 13.77                  # Semimajor Axis (a/R*)
 b = -0.518                 # Impact Parameter
 ecc = 0.052162             # Eccentricity
@@ -28,7 +35,7 @@ omega = 141.11             # Argument of Periastron (Degrees)
 # Define planet and instrument name - CHANGE
 star = 'TOI-1130'
 pn = 'TOI-1130b'
-itm = 'Order2'
+itm = 'Order1'
 
 t = data['times']
 wl = [i for i in data['order'+itm[-1]]['spectral light curves']]   # Reversed order for some reason but it's ok
@@ -50,15 +57,16 @@ for i in range(len(wl)):
 
 # Bin light curves since spec_lcs has spectroscopic light curves in instrument's native resolution
 bin_slc = {}
-for i in range(0, len(wl) - 10, 10):
-    wl_mean = np.round(np.mean(wl[i: i+10]), 7)  # This is just to name the bin
+bin_size = 10
+for i in range(0, len(wl) - bin_size, bin_size):
+    wl_mean = np.round(np.mean(wl[i: i+bin_size]), 7)  # This is just to name the bin
     
     bin_slc[wl_mean] = {}
     bin_slc[wl_mean]['f'] = 0
     bin_slc[wl_mean]['ferr'] = 0
 
-    # Add every 10 spectroscopic light curves together, then normalize flux to 1
-    for j in wl[i: i+10]:
+    # Add every bin_size spectroscopic light curves together, then normalize flux to 1
+    for j in wl[i: i+bin_size]:
         bin_slc[wl_mean]['f'] += spec_lcs[j]['f']
         bin_slc[wl_mean]['ferr'] += spec_lcs[j]['ferr']
 
@@ -89,31 +97,31 @@ with open(pn+'_'+itm+'.csv', 'w', newline = '') as outfile:
         tbin, fsbin, ferrsbin = juliet.bin_data(t, f_s, 25)
 
         # COMMENT/UNCOMMENT FOR ORDER 1 OR 2
-        # # Order 1
-        # params =  ['P_p1', 't0_p1','a_p1','b_p1', 'u1_'+itm, 'u2_'+itm ,'ecc_p1','omega_p1', 'p_p1',
-        #            'mdilution_'+itm, 'mflux_'+itm, 'sigma_w_'+itm, 
-        #            'GP_sigma_'+itm, 'GP_rho_'+itm]
-    
-        # dists = ['fixed', 'fixed', 'fixed', 'fixed', 'uniform', 'uniform', 'fixed', 'fixed', 'uniform',
-        #          'fixed', 'normal', 'loguniform',
-        #         'loguniform', 'loguniform']
-    
-        # hyperps = [per, t0, a, b, [-3., 3.], [-3., 3.], ecc, omega, [0., 0.2],
-        #            1.0, [0., 0.1], [10., 1000.], 
-        #           [1e-8, 1e2], [1e-8, 1e3]]
-        
-        # Order 2
+        # Order 1
         params =  ['P_p1', 't0_p1','a_p1','b_p1', 'u1_'+itm, 'u2_'+itm ,'ecc_p1','omega_p1', 'p_p1',
                    'mdilution_'+itm, 'mflux_'+itm, 'sigma_w_'+itm, 
-                   'theta0_'+itm, 'GP_sigma_'+itm, 'GP_rho_'+itm]
+                   'GP_sigma_'+itm, 'GP_rho_'+itm]
     
-        dists = ['fixed', 'fixed', 'fixed', 'fixed', 'uniform', 'uniform', 'fixed', 'fixed', 'uniform',
+        dists = ['fixed', 'fixed', 'fixed', 'fixed', 'fixed', 'fixed', 'fixed', 'fixed', 'uniform',
                  'fixed', 'normal', 'loguniform',
-                 'uniform', 'loguniform', 'loguniform']
+                'loguniform', 'loguniform']
     
-        hyperps = [per, t0, a, b, [-3., 3.], [-3., 3.], ecc, omega, [0., 0.2],
+        hyperps = [per, t0, a, b, u1, u2, ecc, omega, [0., 0.2],
                    1.0, [0., 0.1], [10., 1000.], 
-                  [-10, 10], [1e-6, 1e6], [1e-3, 1e3]]
+                  [1e-8, 1e2], [1e-8, 1e3]]
+        
+        # # Order 2
+        # params =  ['P_p1', 't0_p1','a_p1','b_p1', 'u1_'+itm, 'u2_'+itm ,'ecc_p1','omega_p1', 'p_p1',
+        #            'mdilution_'+itm, 'mflux_'+itm, 'sigma_w_'+itm, 
+        #            'theta0_'+itm, 'GP_sigma_'+itm, 'GP_rho_'+itm]
+    
+        # dists = ['fixed', 'fixed', 'fixed', 'fixed', 'fixed', 'fixed', 'fixed', 'fixed', 'uniform',
+        #          'fixed', 'normal', 'loguniform',
+        #          'uniform', 'loguniform', 'loguniform']
+    
+        # hyperps = [per, t0, a, b, u1, u2, ecc, omega, [0., 0.2],
+        #            1.0, [0., 0.1], [10., 1000.], 
+        #           [-10, 10], [1e-6, 1e6], [1e-3, 1e3]]
         
         priors = juliet.generate_priors(params, dists, hyperps)
         
@@ -124,17 +132,17 @@ with open(pn+'_'+itm+'.csv', 'w', newline = '') as outfile:
         GP_regressors[itm] = regressors
         
         # Load dataset and run sampler - COMMENT/UNCOMMENT FOR ORDERS 1 AND 2
-        # # Order 1
-        # dataset = juliet.load(priors = priors, t_lc = times, y_lc = fluxes, yerr_lc = fluxes_err, 
-        #           GP_regressors_lc = GP_regressors,
-        #           ld_laws = 'quadratic', out_folder = pn+'_'+str(round(wvlngth, 7))+'_fit')
-        
-        # Order 2
+        # Order 1
         dataset = juliet.load(priors = priors, t_lc = times, y_lc = fluxes, yerr_lc = fluxes_err, 
-                  linear_regressors_lc = linear_regressors, GP_regressors_lc = GP_regressors,
+                  GP_regressors_lc = GP_regressors,
                   ld_laws = 'quadratic', out_folder = pn+'_'+str(round(wvlngth, 7))+'_fit')
         
-        results = dataset.fit(sampler = 'dynamic_dynesty', nthreads = 3, verbose = True, n_live_points = 1000)
+        # # Order 2
+        # dataset = juliet.load(priors = priors, t_lc = times, y_lc = fluxes, yerr_lc = fluxes_err, 
+        #           linear_regressors_lc = linear_regressors, GP_regressors_lc = GP_regressors,
+        #           ld_laws = 'quadratic', out_folder = pn+'_'+str(round(wvlngth, 7))+'_fit')
+        
+        # results = dataset.fit(sampler = 'dynamic_dynesty', nthreads = 3, verbose = True, n_live_points = 1000)
     
         
         # Take jitter values from posterior and multiply into errors
@@ -160,7 +168,7 @@ with open(pn+'_'+itm+'.csv', 'w', newline = '') as outfile:
         plt.xlabel('Time after mid-transit [hours]')
         plt.ylabel('Normalized Flux')
         plt.legend()
-        plt.savefig('/home/peng/PycharmProjects/S26/'+pn+'_'+str(round(wvlngth, 7))+'_fit/'+str(round(wvlngth, 7))+'_lc_fit.png')
+        plt.savefig(pn+'_'+str(round(wvlngth, 7))+'_fit/'+str(round(wvlngth, 7))+'_lc_fit.png')
         plt.close()
         
         # Residuals plot
@@ -174,7 +182,7 @@ with open(pn+'_'+itm+'.csv', 'w', newline = '') as outfile:
         plt.title('Residuals')
         plt.xlabel('Time after mid-transit [hours]')
         plt.ylabel('Difference in Normalized Flux')
-        plt.savefig('/home/peng/PycharmProjects/S26/'+pn+'_'+str(round(wvlngth, 7))+'_fit/'+str(round(wvlngth, 7))+'_residuals.png')
+        plt.savefig(pn+'_'+str(round(wvlngth, 7))+'_fit/'+str(round(wvlngth, 7))+'_residuals.png')
         plt.close()
     
     
@@ -187,7 +195,7 @@ with open(pn+'_'+itm+'.csv', 'w', newline = '') as outfile:
                 list_post.append(results.posteriors['posterior_samples'][f])
         tr = np.array(list_post).T
         corner.corner(tr, labels = names, show_titles=True, quantiles = [0.16, 0.50, 0.84])
-        plt.savefig('/home/peng/PycharmProjects/S26/'+pn+'_'+str(round(wvlngth, 7))+'_fit/'+str(round(wvlngth, 7))+'_corner.png')
+        plt.savefig(pn+'_'+str(round(wvlngth, 7))+'_fit/'+str(round(wvlngth, 7))+'_corner.png')
         plt.close()
     
         # Get transit depths

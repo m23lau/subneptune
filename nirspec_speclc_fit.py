@@ -20,6 +20,13 @@ with open(path + '_jw03385002001_toi1130_nrs1_spectrum.pkl', 'rb') as file:
 per = 4.074554             # Period (Days)
 t0 = 2460543.0631091068    # Mid-Transit Time (BJD) for NRS 1
 # t0 = 2460543.0623039217    # for NRS2
+
+u1 = -1.1989211522   # Limb-darkening coeffs. for NRS 1
+u2 = 2.0524157493
+
+# u1 = -1.0117974286   # for NRS 2
+# u2 = 1.6939836238 
+
 a = 13.77                  # Semimajor Axis (a/R*)
 b = -0.518                 # Impact Parameter
 ecc = 0.052162             # Eccentricity
@@ -55,7 +62,7 @@ for i in range(len(wl)):
 
 # Bin light curves since spec_lcs has spectroscopic light curves in instrument's native resolution
 bin_slc = {}
-bin_size = 20
+bin_size = 10
 for i in range(0, len(wl) - bin_size, bin_size):
     wl_mean = np.round(np.mean(wl[i: i+bin_size]), 7)  # This is just to name the bin
     
@@ -98,11 +105,11 @@ with open(pn+'_'+itm+'.csv', 'w', newline = '') as outfile:
                   'mdilution_'+itm, 'mflux_'+itm, 'sigma_w_'+itm, 
                   'theta0_'+itm]
         
-        dists = ['fixed', 'fixed', 'fixed', 'fixed', 'uniform', 'uniform', 'fixed', 'fixed', 'uniform',
+        dists = ['fixed', 'fixed', 'fixed', 'fixed', 'fixed', 'fixed', 'fixed', 'fixed', 'uniform',
                  'fixed', 'normal', 'loguniform',
                  'uniform']
         
-        hyperps = [per, t0, a, b, [-3., 3.], [-3., 3.], ecc, omega, [0., 0.2],
+        hyperps = [per, t0, a, b, u1, u2, ecc, omega, [0., 0.2],
                    1.0, [0., 0.1], [1., 1000.], 
                   [-10, 10]]
         
@@ -146,7 +153,7 @@ with open(pn+'_'+itm+'.csv', 'w', newline = '') as outfile:
         plt.xlabel('Time after mid-transit [hours]')
         plt.ylabel('Normalized Flux')
         plt.legend()
-        plt.savefig('/home/peng/PycharmProjects/S26/'+pn+'_'+str(round(wvlngth, 7))+'_fit/'+str(round(wvlngth, 7))+'_lc_fit.png')
+        plt.savefig(pn+'_'+str(round(wvlngth, 7))+'_fit/'+str(round(wvlngth, 7))+'_lc_fit.png')
         plt.close()
         
         # Residuals plot
@@ -160,7 +167,7 @@ with open(pn+'_'+itm+'.csv', 'w', newline = '') as outfile:
         plt.title('Residuals')
         plt.xlabel('Time after mid-transit [hours]')
         plt.ylabel('Difference in Normalized Flux')
-        plt.savefig('/home/peng/PycharmProjects/S26/'+pn+'_'+str(round(wvlngth, 7))+'_fit/'+str(round(wvlngth, 7))+'_residuals.png')
+        plt.savefig(pn+'_'+str(round(wvlngth, 7))+'_fit/'+str(round(wvlngth, 7))+'_residuals.png')
         plt.close()
     
     
@@ -173,7 +180,7 @@ with open(pn+'_'+itm+'.csv', 'w', newline = '') as outfile:
                 list_post.append(results.posteriors['posterior_samples'][f])
         tr = np.array(list_post).T
         corner.corner(tr, labels = names, show_titles=True, quantiles = [0.16, 0.50, 0.84])
-        plt.savefig('/home/peng/PycharmProjects/S26/'+pn+'_'+str(round(wvlngth, 7))+'_fit/'+str(round(wvlngth, 7))+'_corner.png')
+        plt.savefig(pn+'_'+str(round(wvlngth, 7))+'_fit/'+str(round(wvlngth, 7))+'_corner.png')
         plt.close()
     
         # Get transit depths
