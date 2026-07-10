@@ -124,19 +124,8 @@ priors = set_priors(planet, star, model, data, prior_types, prior_ranges)
 run_retrieval(planet, star, model, opac, data, priors, wl, P, P_ref, R = R, 
               spectrum_type = 'transmission', sampling_algorithm = 'MultiNest', N_live = 1000, resume = False, verbose = True)
 
-# Read retrieved spectrum confidence regions
-wl, spec_low2, spec_low1, spec_median, spec_high1, spec_high2 = read_retrieved_spectrum(planet_name, model_name)
-
-# Create plot_collection objects for first retrieval
-spectra_median = plot_collection(spec_median, wl, collection = [])
-spectra_low1 = plot_collection(spec_low1, wl, collection = [])
-spectra_low2 = plot_collection(spec_low2, wl, collection = [])
-spectra_high1 = plot_collection(spec_high1, wl, collection = [])
-spectra_high2 = plot_collection(spec_high2, wl, collection = [])
-
 # Generate corner plot
 fig_corner = generate_cornerplot(planet, model)
-
 
 
 # --- Define second model --- # --> comment/uncomment depending on how many you want to do
@@ -182,21 +171,5 @@ priors_2 = set_priors(planet, star, model_2, data, prior_types_2, prior_ranges_2
 run_retrieval(planet, star, model_2, opac_2, data, priors_2, wl, P, P_ref, R = R, 
               spectrum_type = 'transmission', sampling_algorithm = 'MultiNest', N_live = 1000, resume = False, verbose = True)
 
-# Read retrieved spectrum and make more plot_colletion objects that add to previous
-wl, spec_low2, spec_low1, spec_median, spec_high1, spec_high2 = read_retrieved_spectrum(planet_name, model_name_2)
-
-spectra_median = plot_collection(spec_median, wl, collection = spectra_median)
-spectra_low1 = plot_collection(spec_low1, wl, collection = spectra_low1)
-spectra_low2 = plot_collection(spec_low2, wl, collection = spectra_low2)
-spectra_high1 = plot_collection(spec_high1, wl, collection = spectra_high1)
-spectra_high2 = plot_collection(spec_high2, wl, collection = spectra_high2)
-
 # Generate corner plot
 fig_corner = generate_cornerplot(planet, model_2)
-
-
-# # Plot both/all retrievals 
-# fig_spec = plot_spectra_retrieved(spectra_median, spectra_low2, spectra_low1, spectra_high1, spectra_high2, 
-#                                   planet_name, data, R_to_bin = 100, data_labels = ['SOSS Order 2', 'SOSS Order 1', 'NIRSpec NRS1', 'NIRSpec NRS2'], 
-#                                   data_colour_list = ['gold', 'lime', 'cyan', 'steelblue'], 
-#                                   add_retrieved_offsets = True, model = model)
