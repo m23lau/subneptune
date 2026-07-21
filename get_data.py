@@ -5,6 +5,18 @@ import matplotlib.pyplot as plt
 import pickle
 import h5py
 
+# Transitspectroscopy - NIRSpec
+
+# with open('file.pkl', 'rb') as file:
+#     data = pickle.load(file)
+
+# data is a dict with 7 entries: 
+# 1. metadata: Information about instrument and detector, ex. name: NIRSpec, detector: NRS1
+# 2. & 3. tso & tso_err: Not sure, just a bunch of zeroes as far as I can see
+# 4. traces: Contains times in random order, x, ycorrected, ysmoothed
+# 5 spectra: Contains times in increasing order, original + original_err, corrected + corrected_err, wavelength map (a bunch of nans) and wavelengths that the detector measures
+# --> IMPORTANT: data['spectra']['corrected'] and corrected_err contain each spectroscopic lc for the corresponding wavelength in ppm (more detail in next section)
+# 6 & 7. whitelight & whitelight_err: Relative flux for white light curve and its errorbars
 
 def tspec_nirspec(path, bin_size):
     """ Extract data from a transitspectroscopy output file for NIRSpec
@@ -58,7 +70,18 @@ def tspec_nirspec(path, bin_size):
 
     return t, f_wl, ferr_wl, wl, spec_lcs, bin_slc
 
+# -----------------------------------------------------------------------
 
+# Transitspectroscopy - NIRISS
+
+# with open('file.pkl', 'rb') as file:
+#     data = pickle.load(file)
+    
+# data is a dict with 3 entries:
+# 1. order1: Contains spectral light curves and white light for 0.9 to 2.8 micron
+# --> each one of these keys contains more dicts, for example, data['order1']['spectral light curves'] shows each {wavelength: {flux: [...], errors: [...]}} or just flux and errors for wl
+# 2. order2: same as order 1 but for 0.6 to 1.4 micron
+# 3. times: Just an array with times
 
 def tspec_niriss(path, bin_size, order):
     """ Extract data from a transitspectroscopy output file for NIRISS
@@ -114,7 +137,19 @@ def tspec_niriss(path, bin_size, order):
     
     return t, f_wl, ferr_wl, wl, spec_lcs, bin_slc
 
+# -----------------------------------------------------------------------
 
+# Eureka - S4 is the same for all instruments so the output .h5 file is the same
+
+# data = h5py.File('file.h5', 'r')
+
+# Calling data.keys() will list all keys from the file, but the important ones are
+# wavelength: Wavelengths from S3
+# time: Times of observation
+# data: An mxn array containing spectroscopic light curves, with m wavelengths and n fluxes that correspond to time
+# err: A similar array as flux but for slc errors
+# flux_white: White light fluxes, just a 1D array with same length as time
+# err_white: White light flux errors
 
 def eureka_dat(path, bin_size):
     """ Extract data from a Eureka's Stage 4 output file
