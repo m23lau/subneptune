@@ -1,4 +1,4 @@
-# Same as poseidon_retrieval.py but (hopefully) able to run multiple retrievals at once
+# Able to run multiple retrievals at once
 
 import numpy as np
 from POSEIDON.core import create_star, create_planet, load_data, wl_grid_constant_R, define_model, read_opacities, make_atmosphere, set_priors
@@ -101,7 +101,7 @@ print('Free parameters: ' + str(model['param_names']))
 prior_types = {}
 prior_types['T'] = 'uniform'
 prior_types['R_p_ref'] = 'uniform'
-prior_types['log_H2O'] = 'uniform'
+prior_types['log_X'] = 'uniform'
 # prior_types['log_P_cloud'] = 'uniform'
 prior_types['delta_rel_1'] = 'uniform'
 prior_types['delta_rel_2'] = 'uniform'
@@ -111,7 +111,7 @@ prior_types['delta_rel_3'] = 'uniform'
 prior_ranges = {}
 prior_ranges['T'] = [300, 1500]
 prior_ranges['R_p_ref'] = [0.05*R_p, 5*R_p]
-prior_ranges['log_H2O'] = [-12, -1]
+prior_ranges['log_X'] = [-12, -1]
 # prior_ranges['log_P_cloud'] = [-1000, 1000]
 prior_ranges['delta_rel_1'] = [-1000, 1000]
 prior_ranges['delta_rel_2'] = [-1000, 1000]
@@ -127,8 +127,9 @@ run_retrieval(planet, star, model, opac, data, priors, wl, P, P_ref, R = R,
 # Generate corner plot
 fig_corner = generate_cornerplot(planet, model)
 
+# ----------------------------------------------------------------------------------------
 
-# --- Define second model --- # --> comment/uncomment depending on how many you want to do
+# --- Define second model --- # --> comment/uncomment run_retrieval lines depending on how many you want to do
 model_name_2 = 'add_stuff'
 
 bulk_species = ['H2', 'He']
@@ -173,3 +174,99 @@ run_retrieval(planet, star, model_2, opac_2, data, priors_2, wl, P, P_ref, R = R
 
 # Generate corner plot
 fig_corner = generate_cornerplot(planet, model_2)
+
+# ----------------------------------------------------------------------------------------
+
+# --- Define third model --- # --> comment/uncomment run_retrieval lines depending on how many you want to do
+model_name_3 = 'add_morestuff'
+
+bulk_species = ['H2', 'He']
+param_species_3 = ['H2O', 'CO2', 'SO2', 'CH4' ,'CO', 'NH3']
+
+model_3 = define_model(model_name_3, bulk_species, param_species_3, 
+                       PT_profile = 'isotherm', X_profile = 'isochem', 
+                       # cloud_model = 'MacMad17', cloud_type = 'deck', cloud_dim = 1,
+                       offsets_applied = 'three_datasets', 
+                       # stellar_contam = stellar_contam
+                      )
+
+# Read opacity data for new model
+opac_3 = read_opacities(model_3, wl, opacity_treatment, T_fine, log_P_fine)
+
+# Set new priors
+print('Free parameters: ' + str(model_3['param_names']))
+
+prior_types_3 = {}
+prior_types_3['T'] = 'uniform'
+prior_types_3['R_p_ref'] = 'uniform'
+prior_types_3['log_X'] = 'uniform'
+# prior_types_3['log_P_cloud'] = 'uniform'
+prior_types_3['delta_rel_1'] = 'uniform'
+prior_types_3['delta_rel_2'] = 'uniform'
+prior_types_3['delta_rel_3'] = 'uniform'
+
+prior_ranges_3 = {}
+prior_ranges_3['T'] = [300, 1500]
+prior_ranges_3['R_p_ref'] = [0.05*R_p, 5*R_p]
+prior_ranges_3['log_X'] = [-12, -1]
+# prior_ranges_3['log_P_cloud'] = [-1000, 1000]
+prior_ranges_3'delta_rel_1'] = [-1000, 1000]
+prior_ranges_3['delta_rel_2'] = [-1000, 1000]
+prior_ranges_3['delta_rel_3'] = [-1000, 1000]
+
+priors_3 = set_priors(planet, star, model_3, data, prior_types_3, prior_ranges_3)
+
+# Run second retrieval
+run_retrieval(planet, star, model_3, opac_3, data, priors_3, wl, P, P_ref, R = R, 
+              spectrum_type = 'transmission', sampling_algorithm = 'MultiNest', N_live = 1000, resume = False, verbose = True)
+
+# Generate corner plot
+fig_corner = generate_cornerplot(planet, model_3)
+
+# ----------------------------------------------------------------------------------------
+
+# --- Define fourth model --- # --> comment/uncomment run_retrieval lines depending on how many you want to do
+model_name_4 = 'barat_molecules'
+
+bulk_species = ['H2', 'He']
+param_species_4 = ['H2O', 'CO2', 'SO2', 'CH4', 'CO', 'NH3', 'H2S', 'HCN', 'CS2']
+
+model_4 = define_model(model_name_4, bulk_species, param_species_4, 
+                       PT_profile = 'isotherm', X_profile = 'isochem', 
+                       # cloud_model = 'MacMad17', cloud_type = 'deck', cloud_dim = 1,
+                       offsets_applied = 'three_datasets', 
+                       # stellar_contam = stellar_contam
+                      )
+
+# Read opacity data for new model
+opac_4 = read_opacities(model_4, wl, opacity_treatment, T_fine, log_P_fine)
+
+# Set new priors
+print('Free parameters: ' + str(model_4['param_names']))
+
+prior_types_4 = {}
+prior_types_4['T'] = 'uniform'
+prior_types_4['R_p_ref'] = 'uniform'
+prior_types_4['log_X'] = 'uniform'
+# prior_types_4['log_P_cloud'] = 'uniform'
+prior_types_4['delta_rel_1'] = 'uniform'
+prior_types_4['delta_rel_2'] = 'uniform'
+prior_types_4['delta_rel_3'] = 'uniform'
+
+prior_ranges_4 = {}
+prior_ranges_4['T'] = [300, 1500]
+prior_ranges_4['R_p_ref'] = [0.05*R_p, 5*R_p]
+prior_ranges_4['log_X'] = [-12, -1]
+# prior_ranges_4['log_P_cloud'] = [-1000, 1000]
+prior_ranges_4'delta_rel_1'] = [-1000, 1000]
+prior_ranges_4['delta_rel_2'] = [-1000, 1000]
+prior_ranges_4['delta_rel_3'] = [-1000, 1000]
+
+priors_4 = set_priors(planet, star, model_4, data, prior_types_4, prior_ranges_4)
+
+# Run second retrieval
+run_retrieval(planet, star, model_4, opac_4, data, priors_4, wl, P, P_ref, R = R, 
+              spectrum_type = 'transmission', sampling_algorithm = 'MultiNest', N_live = 1000, resume = False, verbose = True)
+
+# Generate corner plot
+fig_corner = generate_cornerplot(planet, model_4)
