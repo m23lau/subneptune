@@ -36,7 +36,11 @@ def tspec_nirspec(path, bin_size):
     # White light curves
     f_wl = data['whitelight']
     ferr_wl = data['whitelight_err']
-
+    
+    # Normalize white light curves
+    f_med = np.nanmedian(f_wl[:100])
+    f_wl, ferr_wl = f_wl / f_med, ferr_wl / f_med
+    
     # Spectroscopic light curves
     wl = spectra['wavelengths']
     slc, slcerr = spectra['corrected'], spectra['corrected_err']
@@ -102,6 +106,10 @@ def tspec_niriss(path, bin_size, order):
     f_wl = data['order'+str(order)]['white light']['flux']
     ferr_wl = data['order'+str(order)]['white light']['errors']
 
+    # Normalize white light curves
+    f_med = np.nanmedian(f_wl[:100])
+    f_wl, ferr_wl = f_wl / f_med, ferr_wl / f_med
+    
     # Spectroscopic light curves
     wl = [i for i in data['order'+str(order)]['spectral light curves']]
 
@@ -151,14 +159,15 @@ def tspec_niriss(path, bin_size, order):
 # flux_white: White light fluxes, just a 1D array with same length as time
 # err_white: White light flux errors
 
-def eureka_dat(path, bin_size):
+# Since you can bin the data within Eureka's S4 ecf, no need to create bin_slc here
+
+def eureka_dat(path):
     """ Extract data from a Eureka's Stage 4 output file
     Args:
         path (str): Path to file
-        bin_size (int): Resolution to bin spectroscopic light curves down to 
     Returns:
         tuple: ndarray, ndarray, ndarray, ndarray, dict, dict
-               times, white light flux, wl err, wavelengths, spectroscopic lcs and binned slcs
+               times, white light flux, wl err, wavelengths and spectroscopic lcs
     """
     data = h5py.File(path)
     t = np.array(data['time'])
@@ -167,6 +176,10 @@ def eureka_dat(path, bin_size):
     f_wl = np.array(data['flux_white'])         
     ferr_wl = np.array(data['err_white'])
 
+     # Normalize white light curves
+    f_med = np.nanmedian(f_wl[:100])
+    f_wl, ferr_wl = f_wl / f_med, ferr_wl / f_med
+    
     # Spectroscopic light curves
     wl = np.array(data['wavelength'])
     slc = np.array(data['data'])
@@ -182,21 +195,4 @@ def eureka_dat(path, bin_size):
         spec_lcs[wavelength]['f'] = slc[i] / slc_med
         spec_lcs[wavelength]['ferr'] = slcerr[i] / slc_med
 
-    # Binned spectroscopic light curves
-    bin_slc = {}
-    for i in range(0, len(wl) - bin_size, bin_size):
-        wl_mean = np.round(np.mean(wl[i: i+bin_size]), 7)
-        bin_slc[wl_mean] = {}
-        bin_slc[wl_mean]['f'] = 0
-        bin_slc[wl_mean]['ferr'] = 0
-    
-        # Add every bin_size spectroscopic light curves together, then normalize flux to 1
-        for j in wl[i: i+bin_size]:
-            bin_slc[wl_mean]['f'] += spec_lcs[j]['f']
-            bin_slc[wl_mean]['ferr'] += spec_lcs[j]['ferr']
-    
-        fbin_med = np.nanmedian(bin_slc[wl_mean]['f'][:100])
-        bin_slc[wl_mean]['f'] = bin_slc[wl_mean]['f'] / fbin_med
-        bin_slc[wl_mean]['ferr'] = bin_slc[wl_mean]['ferr'] / fbin_med
-
-    return t, f_wl, ferr_wl, wl, spec_lcs, bin_slc
+    return t, f_wl, ferr_wl, wl, spec_lcs
